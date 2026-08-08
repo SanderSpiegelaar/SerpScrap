@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-serpscrap}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
     volumes:
-      - ../data/postgres:/var/lib/postgresql/data
+      - serpscrap-postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -17,7 +17,7 @@ services:
   serpscrap-app:
     image: ${SERPSCRAP_IMAGE:-serpscrap:2.0.0-alpha.1}
     build:
-      context: ..
+      context: .
       dockerfile: docker/Dockerfile
     restart: unless-stopped
     stop_grace_period: 30s
@@ -32,10 +32,8 @@ services:
       SERPSCRAP_MAX_QUEUED_JOBS: ${SERPSCRAP_MAX_QUEUED_JOBS:-16}
       SERVICE_FQDN_SERPSCRAP_APP_8000:
     volumes:
-      - ../data/cache:/var/lib/serpscrap/cache
-      - ../data/diagnostics:/var/lib/serpscrap/diagnostics
-      - ../data/exports:/var/lib/serpscrap/exports
-      - ../logs:/var/log/serpscrap
+      - serpscrap-data:/var/lib/serpscrap
+      - serpscrap-logs:/var/log/serpscrap
     depends_on:
       serpscrap-db:
         condition: service_healthy
